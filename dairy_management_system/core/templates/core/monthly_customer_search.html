@@ -1,0 +1,13 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div><h2 class="mb-1">Monthly Customer Search</h2><p class="text-muted mb-0">Use this search for daily-basis customers who pay once every month.</p></div>
+    <a class="btn btn-primary rounded-pill" href="{% url 'monthly_bill_create' %}">Generate Monthly Bill</a>
+</div>
+<form class="card card-stat mb-3"><div class="card-body"><div class="row g-2"><div class="col-md-6"><input class="form-control form-control-lg" name="q" value="{{ query }}" placeholder="Search customer by name, mobile number, or address"></div><div class="col-md-auto"><button class="btn btn-outline-primary btn-lg rounded-pill px-4">Search</button></div></div></div></form>
+<div class="card daily-entry-card"><div class="card-body table-responsive">
+<table class="table table-hover align-middle"><thead><tr><th>Customer</th><th>Mobile</th><th>Address</th><th>Unbilled Entries</th><th>Unbilled Amount</th><th>Action</th></tr></thead><tbody>
+{% for row in rows %}<tr><td>{{ row.customer.name }}</td><td>{{ row.customer.mobile_number }}</td><td>{{ row.customer.address|default:'-' }}</td><td>{{ row.unbilled_count }}</td><td>Rs. {{ row.unbilled_total }}</td><td><a class="btn btn-sm btn-outline-primary rounded-pill" href="{% url 'daily_customer_entry_create' %}?customer={{ row.customer.pk }}">Add Product</a> <a class="btn btn-sm btn-success rounded-pill" href="{% url 'monthly_bill_create' %}?customer={{ row.customer.pk }}">Generate Bill</a></td></tr>{% empty %}<tr><td colspan="6">No regular customers found.</td></tr>{% endfor %}
+</tbody></table>
+</div></div>
+{% endblock %}

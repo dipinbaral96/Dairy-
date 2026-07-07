@@ -1,0 +1,35 @@
+Fix for: "Python was not found" / "pip is not recognized"
+=========================================================
+
+This Django project needs Python installed on Windows.
+
+Recommended setup:
+1. Download Python 3.11 or newer from:
+   https://www.python.org/downloads/windows/
+
+2. Run the installer.
+
+3. IMPORTANT: Tick/check this option on the first installer screen:
+   Add python.exe to PATH
+
+4. Click Install Now.
+
+5. After installation, close all Command Prompt windows.
+
+6. Double-click run_windows.bat again.
+
+If Python is already installed but Windows still shows Microsoft Store message:
+1. Open Windows Settings.
+2. Go to Apps.
+3. Open Advanced app settings.
+4. Open App execution aliases.
+5. Turn OFF:
+   - python.exe
+   - python3.exe
+6. Run run_windows.bat again.
+
+To check manually, open Command Prompt and run:
+python --version
+
+or:
+py -3 --version

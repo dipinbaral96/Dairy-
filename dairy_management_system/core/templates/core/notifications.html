@@ -1,0 +1,25 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div><h2 class="mb-1">Notifications</h2><p class="text-muted mb-0">Web, email, SMS, and Firebase notification log for users and roles.</p></div>
+    {% if current_role == Role.ADMIN %}<a class="btn btn-primary rounded-pill" href="{% url 'notification_create' %}">Create Notification</a>{% endif %}
+</div>
+<div class="card card-stat"><div class="card-body table-responsive">
+<table class="table table-hover align-middle">
+<thead><tr><th>Date</th><th>Title</th><th>Message</th><th>Recipient / Role</th><th>Channel</th><th>Status</th><th></th></tr></thead>
+<tbody>
+{% for note in notifications %}
+<tr>
+    <td>{{ note.created_at|date:'Y-m-d H:i' }}</td>
+    <td class="fw-semibold">{{ note.title }}</td>
+    <td>{{ note.message|truncatechars:90 }}</td>
+    <td>{% if note.recipient %}{{ note.recipient.username }}{% else %}{{ note.get_target_role_display|default:'All' }}{% endif %}</td>
+    <td>{{ note.get_channel_display }}</td>
+    <td><span class="badge badge-soft">{{ note.get_status_display }}</span></td>
+    <td>{% if note.status != 'READ' %}<a class="btn btn-sm btn-outline-primary rounded-pill" href="{% url 'notification_mark_read' note.pk %}">Mark Read</a>{% endif %}</td>
+</tr>
+{% empty %}<tr><td colspan="7">No notifications.</td></tr>{% endfor %}
+</tbody>
+</table>
+</div></div>
+{% endblock %}

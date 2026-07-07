@@ -1,0 +1,58 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">Backup / Restore</h2>
+        <p class="text-muted mb-0">Download the current database, create backup copies, and restore from uploaded SQLite backup files.</p>
+    </div>
+    <a class="btn btn-primary rounded-pill" href="{% url 'backup_download' %}">Download Current Backup</a>
+</div>
+<div class="row g-3 mb-3">
+    <div class="col-lg-4">
+        <div class="card card-stat h-100"><div class="card-body">
+            <div class="stat-icon">💾</div>
+            <h6>Current Database</h6>
+            <h3>{{ current_db_size|filesizeformat }}</h3>
+            <p class="text-muted mb-3">This is the active SQLite database file used by the system.</p>
+            <form method="post" action="{% url 'backup_create' %}">{% csrf_token %}
+                <button class="btn btn-outline-primary rounded-pill w-100">Create Saved Backup</button>
+            </form>
+        </div></div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card card-stat h-100"><div class="card-body">
+            <h5 class="fw-bold mb-3">Upload and Restore Backup</h5>
+            <div class="backup-drop">
+                <form method="post" enctype="multipart/form-data" action="{% url 'backup_upload' %}" onsubmit="return confirm('This will replace the current database. A safety copy will be created first. Continue?')">
+                    {% csrf_token %}
+                    <label class="form-label fw-semibold">Choose .sqlite3 or .db backup file</label>
+                    <input type="file" name="backup_file" class="form-control mb-3" accept=".sqlite3,.db" required>
+                    <button class="btn btn-danger rounded-pill px-4">Upload & Restore</button>
+                    <span class="text-muted ms-2 small">Restart server after restore for best result.</span>
+                </form>
+            </div>
+        </div></div>
+    </div>
+</div>
+<div class="card card-stat"><div class="card-body table-responsive">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">Saved Backups</h5>
+        <span class="badge badge-soft">{{ backups|length }} files</span>
+    </div>
+    <table class="table table-hover align-middle">
+        <thead><tr><th>File Name</th><th>Size</th><th>Created / Modified</th><th>Action</th></tr></thead>
+        <tbody>
+        {% for backup in backups %}
+            <tr>
+                <td>{{ backup.name }}</td>
+                <td>{{ backup.size|filesizeformat }}</td>
+                <td>{{ backup.modified|date:'Y-m-d H:i:s' }}</td>
+                <td><a class="btn btn-sm btn-outline-primary rounded-pill" href="{% url 'backup_file_download' backup.name %}">Download</a></td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="4">No saved backups yet. Click Create Saved Backup first.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div></div>
+{% endblock %}

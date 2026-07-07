@@ -1,0 +1,45 @@
+{% extends 'core/base.html' %}
+{% load core_tags %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div><h2 class="mb-1">{{ report_title }}</h2><p class="text-muted mb-0">Complete MIS reports with search, date/product/customer/seller/shop filters, PDF, Excel, and print.</p></div>
+    <div class="d-flex gap-2 no-print">
+        <button class="btn btn-outline-secondary rounded-pill" onclick="window.print()">Print</button>
+        <a class="btn btn-outline-success rounded-pill" href="?{{ request.GET.urlencode }}&export=excel">Export Excel</a>
+        <a class="btn btn-outline-danger rounded-pill" href="?{{ request.GET.urlencode }}&export=pdf">Export PDF</a>
+    </div>
+</div>
+<div class="card card-stat mb-3 no-print"><div class="card-body">
+<form method="get" class="row g-2">
+    <div class="col-md-3"><label class="form-label">Report Type</label><select name="type" class="form-select">{% for value,label in report_types %}<option value="{{ value }}" {% if report_type == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+    <div class="col-md-2"><label class="form-label">From</label><input type="date" name="date_from" value="{{ filters.date_from }}" class="form-control"></div>
+    <div class="col-md-2"><label class="form-label">To</label><input type="date" name="date_to" value="{{ filters.date_to }}" class="form-control"></div>
+    <div class="col-md-2"><label class="form-label">Product</label><select name="product" class="form-select"><option value="">All</option>{% for p in products %}<option value="{{ p.pk }}" {% if filters.product == p.pk|stringformat:'s' %}selected{% endif %}>{{ p.name }}</option>{% endfor %}</select></div>
+    <div class="col-md-3"><label class="form-label">Customer</label><select name="customer" class="form-select"><option value="">All</option>{% for c in customers %}<option value="{{ c.pk }}" {% if filters.customer == c.pk|stringformat:'s' %}selected{% endif %}>{{ c.name }}</option>{% endfor %}</select></div>
+    <div class="col-md-2"><label class="form-label">Seller</label><select name="seller" class="form-select"><option value="">All</option>{% for s in sellers %}<option value="{{ s.pk }}" {% if filters.seller == s.pk|stringformat:'s' %}selected{% endif %}>{{ s.username }}</option>{% endfor %}</select></div>
+    <div class="col-md-2"><label class="form-label">Shop</label><select name="shop" class="form-select"><option value="">All</option>{% for s in shops %}<option value="{{ s.pk }}" {% if filters.shop == s.pk|stringformat:'s' %}selected{% endif %}>{{ s.name }}</option>{% endfor %}</select></div>
+    <div class="col-md-2"><label class="form-label">Payment</label><select name="payment" class="form-select"><option value="">All</option>{% for p in payments %}<option value="{{ p.pk }}" {% if filters.payment == p.pk|stringformat:'s' %}selected{% endif %}>{{ p.name }}</option>{% endfor %}</select></div>
+    <div class="col-md-auto align-self-end"><button class="btn btn-primary rounded-pill px-4">Apply</button></div>
+    <div class="col-md-auto align-self-end"><a href="{% url 'mis_reports' %}" class="btn btn-outline-secondary rounded-pill px-4">Clear</a></div>
+</form>
+<form method="post" class="row g-2 mt-2">{% csrf_token %}
+    <div class="col-md-4"><input name="name" class="form-control" placeholder="Save this report filter as..."></div>
+    <div class="col-md-auto"><button class="btn btn-outline-primary rounded-pill">Save Report Configuration</button></div>
+</form>
+</div></div>
+<div class="card card-stat"><div class="card-body table-responsive">
+<table class="table table-hover align-middle">
+<thead><tr>{% for key,label in columns %}<th>{{ label }}</th>{% endfor %}</tr></thead>
+<tbody>
+{% for row in rows %}
+<tr>{% for key,label in columns %}<td>{{ row|get_item:key|default:'-' }}</td>{% endfor %}</tr>
+{% empty %}<tr><td colspan="99">No report records found.</td></tr>{% endfor %}
+</tbody>
+</table>
+</div></div>
+{% if saved_reports %}
+<div class="card card-stat mt-3 no-print"><div class="card-body"><h5 class="fw-bold">Saved Report Configurations</h5>
+<ul class="mb-0">{% for report in saved_reports %}<li>{{ report.name }} — {{ report.report_type }} — {{ report.created_at|date:'Y-m-d H:i' }}</li>{% endfor %}</ul>
+</div></div>
+{% endif %}
+{% endblock %}

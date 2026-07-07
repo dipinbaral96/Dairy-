@@ -1,0 +1,20 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3"><h2>Sales Report</h2><div><a class="btn btn-outline-success" href="?{{ request.GET.urlencode }}&export=excel">Export Excel</a> <a class="btn btn-outline-danger" href="?{{ request.GET.urlencode }}&export=pdf">Export PDF</a></div></div>
+<div class="card card-stat mb-3"><div class="card-body">
+<form method="get" class="row g-2">
+    <div class="col-md-2"><label class="form-label">From</label><input type="date" name="date_from" value="{{ filters.date_from }}" class="form-control"></div>
+    <div class="col-md-2"><label class="form-label">To</label><input type="date" name="date_to" value="{{ filters.date_to }}" class="form-control"></div>
+    <div class="col-md-2"><label class="form-label">Shop</label><select name="shop" class="form-select"><option value="">All</option>{% for s in shops %}<option value="{{ s.pk }}" {% if filters.shop == s.pk|stringformat:'s' %}selected{% endif %}>{{ s.name }}</option>{% endfor %}</select></div>
+    <div class="col-md-2"><label class="form-label">Payment</label><select name="payment" class="form-select"><option value="">All</option>{% for p in payments %}<option value="{{ p.pk }}" {% if filters.payment == p.pk|stringformat:'s' %}selected{% endif %}>{{ p.name }}</option>{% endfor %}</select></div>
+    <div class="col-md-2"><label class="form-label">Customer</label><select name="customer" class="form-select"><option value="">All</option>{% for c in customers %}<option value="{{ c.pk }}" {% if filters.customer == c.pk|stringformat:'s' %}selected{% endif %}>{{ c.name }}</option>{% endfor %}</select></div>
+    <div class="col-md-2"><label class="form-label">Seller</label><select name="seller" class="form-select"><option value="">All</option>{% for s in sellers %}<option value="{{ s.pk }}" {% if filters.seller == s.pk|stringformat:'s' %}selected{% endif %}>{{ s.username }}</option>{% endfor %}</select></div>
+    <div class="col-md-auto align-self-end"><button class="btn btn-primary">Filter</button></div>
+</form>
+</div></div>
+<div class="row g-3 mb-3"><div class="col-md-3"><div class="card card-stat"><div class="card-body"><h6>Total Sales</h6><h3>Rs. {{ total_amount }}</h3></div></div></div><div class="col-md-3"><div class="card card-stat"><div class="card-body"><h6>Total Due</h6><h3>Rs. {{ total_due }}</h3></div></div></div></div>
+<div class="card card-stat"><div class="card-body table-responsive"><table class="table table-striped align-middle">
+<thead><tr><th>Bill</th><th>Date</th><th>Customer</th><th>Seller</th><th>Shop</th><th>Payment</th><th>Total</th><th>Due</th></tr></thead>
+<tbody>{% for sale in sales %}<tr><td><a href="{% url 'sale_detail' sale.pk %}">{{ sale.bill_number }}</a></td><td>{{ sale.created_at|date:'Y-m-d H:i' }}</td><td>{{ sale.customer.name }}</td><td>{{ sale.seller.username }}</td><td>{{ sale.shop.name|default:'-' }}</td><td>{{ sale.payment_method.name }}</td><td>Rs. {{ sale.total_amount }}</td><td>Rs. {{ sale.due_amount }}</td></tr>{% empty %}<tr><td colspan="8">No sales found.</td></tr>{% endfor %}</tbody>
+</table></div></div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div>
+        <h2 class="mb-1">Admin Dashboard</h2>
+        <p class="text-muted mb-0">Overview of stock, sales, customers, logs, and dairy activity.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a class="btn btn-primary rounded-pill" href="{% url 'receiving_create' %}">Receive Product</a>
+        <a class="btn btn-outline-primary rounded-pill" href="{% url 'backup_restore' %}">Backup / Restore</a>
+    </div>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card card-stat stat-card"><div class="card-body"><div class="stat-icon">🥛</div><h6>Products</h6><h3>{{ products_count }}</h3></div></div></div>
+    <div class="col-md-3"><div class="card card-stat stat-card"><div class="card-body"><div class="stat-icon">🙋</div><h6>Customers</h6><h3>{{ customers_count }}</h3></div></div></div>
+    <div class="col-md-3"><div class="card card-stat stat-card"><div class="card-body"><div class="stat-icon">👥</div><h6>Sellers</h6><h3>{{ sellers_count }}</h3></div></div></div>
+    <div class="col-md-3"><div class="card card-stat stat-card"><div class="card-body"><div class="stat-icon">💰</div><h6>Today Sales</h6><h3>Rs. {{ today_sales }}</h3></div></div></div>
+</div>
+<div class="row g-3">
+    <div class="col-xl-7">
+        <div class="card card-stat h-100"><div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Recent Sales</h5>
+                <a href="{% url 'sales_report' %}" class="btn btn-sm btn-outline-primary rounded-pill">View Report</a>
+            </div>
+            <div class="table-responsive"><table class="table table-hover align-middle">
+                <thead><tr><th>Bill</th><th>Customer</th><th>Payment</th><th>Total</th><th>Date</th></tr></thead>
+                <tbody>{% for sale in recent_sales %}<tr><td><a href="{% url 'sale_detail' sale.pk %}">{{ sale.bill_number }}</a></td><td>{{ sale.customer.name }}</td><td>{{ sale.payment_method.name }}</td><td>Rs. {{ sale.total_amount }}</td><td>{{ sale.created_at|date:'Y-m-d H:i' }}</td></tr>{% empty %}<tr><td colspan="5">No sales yet.</td></tr>{% endfor %}</tbody>
+            </table></div>
+        </div></div>
+    </div>
+    <div class="col-xl-5">
+        <div class="card card-stat h-100"><div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Low Stock Products</h5>
+                <a href="{% url 'stock_report' %}" class="btn btn-sm btn-outline-primary rounded-pill">Stock Report</a>
+            </div>
+            <ul class="list-group list-group-flush">
+                {% for product in low_stock_products %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent"><span>{{ product.name }}</span><span class="badge text-bg-warning rounded-pill">{{ product.current_stock }} {{ product.unit.short_form }}</span></li>
+                {% empty %}
+                    <li class="list-group-item bg-transparent">No low stock products.</li>
+                {% endfor %}
+            </ul>
+        </div></div>
+    </div>
+    <div class="col-12">
+        <div class="card card-stat"><div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Recent Activity Logs</h5>
+                <a href="{% url 'audit_logs' %}" class="btn btn-sm btn-outline-primary rounded-pill">Open Logs</a>
+            </div>
+            <div class="table-responsive"><table class="table table-hover align-middle mb-0">
+                <thead><tr><th>Date</th><th>User</th><th>Action</th><th>Module</th><th>Details</th></tr></thead>
+                <tbody>{% for log in recent_logs %}<tr><td>{{ log.created_at|date:'Y-m-d H:i' }}</td><td>{{ log.user.username|default:'System' }}</td><td><span class="badge badge-soft">{{ log.action }}</span></td><td>{{ log.model_name }}</td><td>{{ log.object_repr }}</td></tr>{% empty %}<tr><td colspan="5">No activity logs yet.</td></tr>{% endfor %}</tbody>
+            </table></div>
+        </div></div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">Product Catalog</h2>
+        <p class="text-muted mb-0">Available dairy products, rates, units, stock, and active batch details.</p>
+    </div>
+</div>
+<div class="card card-stat mb-3"><div class="card-body">
+    <form method="get" class="row g-2">
+        <div class="col-md-8"><input class="form-control" name="q" value="{{ query }}" placeholder="Search product, code, or category"></div>
+        <div class="col-md-auto"><button class="btn btn-primary rounded-pill px-4">Search</button></div>
+        <div class="col-md-auto"><a class="btn btn-outline-secondary rounded-pill px-4" href="{% url 'product_catalog' %}">Clear</a></div>
+    </form>
+</div></div>
+<div class="row g-3">
+{% for row in rows %}
+    <div class="col-xl-4 col-md-6">
+        <div class="card card-stat h-100 product-card"><div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+                <div><h4 class="fw-bold mb-1">{{ row.product.name }}</h4><p class="text-muted mb-2">{{ row.product.code }} • {{ row.product.category|default:'Dairy Product' }}</p></div>
+                <span class="badge text-bg-primary rounded-pill">Rs. {{ row.product.selling_price }} / {{ row.product.unit.short_form }}</span>
+            </div>
+            <div class="stock-strip my-3"><strong>{{ row.stock }}</strong> {{ row.product.unit.short_form }} available</div>
+            <h6>Active Batches</h6>
+            <div class="table-responsive"><table class="table table-sm mb-0">
+                <thead><tr><th>Batch</th><th>Available</th><th>Expiry</th></tr></thead>
+                <tbody>{% for batch in row.batches %}<tr><td>{{ batch.batch_number }}</td><td>{{ batch.available_quantity }}</td><td>{{ batch.expiry_date|date:'Y-m-d'|default:'-' }}</td></tr>{% empty %}<tr><td colspan="3">No active batch.</td></tr>{% endfor %}</tbody>
+            </table></div>
+        </div></div>
+    </div>
+{% empty %}
+    <div class="col-12"><div class="alert alert-info">No products found.</div></div>
+{% endfor %}
+</div>
+{% endblock %}

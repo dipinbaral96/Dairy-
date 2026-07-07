@@ -1,0 +1,26 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Seller Dashboard</h2>
+    <a class="btn btn-primary" href="{% url 'sale_create' %}">Generate New Bill</a>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-md-4"><div class="card card-stat"><div class="card-body"><h6>My Sales Today</h6><h3>Rs. {{ today_sales }}</h3></div></div></div>
+    <div class="col-md-4"><div class="card card-stat"><div class="card-body"><h6>Available Batches</h6><h3>{{ available_batches|length }}</h3></div></div></div>
+    <div class="col-md-4"><div class="card card-stat"><div class="card-body"><h6>Recent Bills</h6><h3>{{ recent_bills|length }}</h3></div></div></div>
+</div>
+<div class="row g-3">
+    <div class="col-lg-6"><div class="card card-stat"><div class="card-body">
+        <h5>Available Products</h5>
+        <table class="table table-sm"><thead><tr><th>Product</th><th>Batch</th><th>Available</th></tr></thead><tbody>
+            {% for batch in available_batches %}<tr><td>{{ batch.product.name }}</td><td>{{ batch.batch_number }}</td><td>{{ batch.available_quantity }}</td></tr>{% empty %}<tr><td colspan="3">No stock available.</td></tr>{% endfor %}
+        </tbody></table>
+    </div></div></div>
+    <div class="col-lg-6"><div class="card card-stat"><div class="card-body">
+        <h5>Recent Bills</h5>
+        <table class="table table-sm"><thead><tr><th>Bill</th><th>Customer</th><th>Total</th></tr></thead><tbody>
+            {% for sale in recent_bills %}<tr><td><a href="{% url 'sale_detail' sale.pk %}">{{ sale.bill_number }}</a></td><td>{{ sale.customer.name }}</td><td>Rs. {{ sale.total_amount }}</td></tr>{% empty %}<tr><td colspan="3">No bill yet.</td></tr>{% endfor %}
+        </tbody></table>
+    </div></div></div>
+</div>
+{% endblock %}

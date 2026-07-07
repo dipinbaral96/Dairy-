@@ -1,0 +1,8 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<h2 class="mb-3">Stock Report</h2>
+<div class="card card-stat"><div class="card-body table-responsive"><table class="table table-striped align-middle">
+<thead><tr><th>Product</th><th>Code</th><th>Available Stock</th><th>Unit</th><th>Low Stock Threshold</th><th>Status</th></tr></thead>
+<tbody>{% for row in rows %}<tr><td>{{ row.product.name }}</td><td>{{ row.product.code }}</td><td>{{ row.stock }}</td><td>{{ row.product.unit.short_form }}</td><td>{{ row.product.low_stock_threshold }}</td><td>{% if row.low %}<span class="badge text-bg-warning">Low Stock</span>{% else %}<span class="badge text-bg-success">Available</span>{% endif %}</td></tr>{% empty %}<tr><td colspan="6">No products.</td></tr>{% endfor %}</tbody>
+</table></div></div>
+{% endblock %}

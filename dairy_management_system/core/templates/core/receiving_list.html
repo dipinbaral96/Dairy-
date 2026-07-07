@@ -1,0 +1,20 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div><h2 class="mb-1">Daily Product Receiving / Product Batches</h2><p class="text-muted mb-0">Receive products, view automatic batch numbers, update stock status, and manage expiry.</p></div>
+    <a class="btn btn-primary rounded-pill" href="{% url 'receiving_create' %}">Receive Product</a>
+</div>
+<div class="card card-stat"><div class="card-body table-responsive"><table class="table table-hover align-middle">
+<thead><tr><th>Date</th><th>Product</th><th>Batch No.</th><th>Received</th><th>Available</th><th>Expiry</th><th>Status</th><th>Action</th></tr></thead>
+<tbody>
+{% for b in batches %}
+<tr>
+    <td>{{ b.received_date }}</td><td>{{ b.product.name }}</td><td><span class="badge badge-soft">{{ b.batch_number }}</span></td>
+    <td>{{ b.quantity_received }} {{ b.product.unit.short_form }}</td><td>{{ b.available_quantity }} {{ b.product.unit.short_form }}</td><td>{{ b.expiry_date|default:'-' }}</td><td>{{ b.get_status_display }}</td>
+    <td class="text-nowrap"><a class="btn btn-sm btn-outline-primary rounded-pill" href="{% url 'batch_update' b.pk %}">Edit</a>
+    <form method="post" action="{% url 'batch_delete' b.pk %}" class="d-inline" onsubmit="return confirm('Delete this batch?')">{% csrf_token %}<button class="btn btn-sm btn-outline-danger rounded-pill">Delete</button></form></td>
+</tr>
+{% empty %}<tr><td colspan="8">No receiving records.</td></tr>{% endfor %}
+</tbody>
+</table></div></div>
+{% endblock %}

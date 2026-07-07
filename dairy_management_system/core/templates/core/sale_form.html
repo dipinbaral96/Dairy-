@@ -1,0 +1,40 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ title }}</h2>
+    <a class="btn btn-outline-secondary" href="{% url 'customer_create' %}?next={% url 'sale_create' %}">Register New Customer</a>
+</div>
+<form method="post" novalidate>
+    {% csrf_token %}
+    <div class="card card-stat mb-3"><div class="card-body">
+        <div class="row g-3">
+            {% for field in form %}
+                <div class="col-md-4">
+                    <label class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+    </div></div>
+    <div class="card card-stat"><div class="card-body">
+        <h5>Products</h5>
+        {{ formset.management_form }}
+        <div class="table-responsive"><table class="table align-middle">
+            <thead><tr><th style="width:55%">Available Batch</th><th>Quantity</th><th>Item Discount</th><th>Remove</th></tr></thead>
+            <tbody>
+            {% for item_form in formset %}
+                <tr>
+                    <td>{{ item_form.batch }}{% for error in item_form.batch.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</td>
+                    <td>{{ item_form.quantity }}{% for error in item_form.quantity.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</td>
+                    <td>{{ item_form.item_discount }}{% for error in item_form.item_discount.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</td>
+                    <td>{% if item_form.DELETE %}{{ item_form.DELETE }}{% endif %}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table></div>
+        {% if formset.non_form_errors %}<div class="alert alert-danger">{{ formset.non_form_errors }}</div>{% endif %}
+        <button class="btn btn-success btn-lg">Generate Bill & Deduct Stock</button>
+    </div></div>
+</form>
+{% endblock %}

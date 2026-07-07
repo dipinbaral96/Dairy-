@@ -1,0 +1,106 @@
+{% load static %}
+<!doctype html>
+<html lang="{{ current_language|default:'en' }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title|default:'Dairy Management System' }}</title>
+    <link rel="icon" href="{{ site_logo_url }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'css/app.css' %}" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg app-navbar no-print">
+    <div class="container-fluid px-3 px-lg-4">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'dashboard' %}">
+            <img src="{{ site_logo_url }}" alt="Logo" class="brand-logo">
+            <span>{{ dairy_profile.name|default:'Dairy Management System' }}</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNav"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="topNav">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">🌐 {% if current_language == 'ne' %}नेपाली{% else %}English{% endif %}</a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{% url 'set_language' 'en' %}">English</a></li>
+                        <li><a class="dropdown-item" href="{% url 'set_language' 'ne' %}">नेपाली</a></li>
+                    </ul>
+                </li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link text-white position-relative" href="{% url 'notifications' %}">🔔 {% if unread_notifications %}<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ unread_notifications }}</span>{% endif %}</a></li>
+                    <li class="nav-item"><span class="nav-link user-pill">{{ user.username }} {% if current_role %}<small>{{ current_role }}</small>{% endif %}</span></li>
+                    <li class="nav-item"><a class="btn btn-light btn-sm rounded-pill px-3" href="{% url 'logout' %}">{{ L.logout }}</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid page-shell">
+    <div class="row g-0">
+        {% if user.is_authenticated %}
+        <aside class="col-md-3 col-lg-2 sidebar no-print">
+            <div class="sidebar-logo text-center">
+                <img src="{{ bill_logo_url }}" alt="Dairy Logo" class="sidebar-image">
+                <div class="sidebar-title">Dairy Control Panel</div>
+            </div>
+            <a href="{% url 'dashboard' %}">🏠 {{ L.dashboard }}</a>
+            <a href="{% url 'product_catalog' %}">🥛 {{ L.product_catalog }}</a>
+            <a href="{% url 'notifications' %}">🔔 {{ L.notifications }} {% if unread_notifications %}<span class="badge bg-danger ms-1">{{ unread_notifications }}</span>{% endif %}</a>
+            {% if current_role == Role.ADMIN %}
+                <div class="sidebar-section">{{ L.administration }}</div>
+                <a href="{% url 'dairy_profile' %}">🏢 {{ L.dairy_profile }}</a>
+                <a href="{% url 'user_list' %}">👥 {{ L.users }}</a>
+                <a href="{% url 'shop_list' %}">🏬 {{ L.shops }}</a>
+                <a href="{% url 'unit_list' %}">⚖️ {{ L.units }}</a>
+                <a href="{% url 'product_list' %}">🥛 {{ L.products }}</a>
+                <a href="{% url 'receiving_list' %}">📦 {{ L.daily_receiving }}</a>
+                <a href="{% url 'customer_list' %}">🙋 {{ L.customers }}</a>
+                <a href="{% url 'payment_list' %}">💳 {{ L.payments }}</a>
+                <a href="{% url 'fiscal_year_list' %}">📅 Fiscal Years</a>
+                <a href="{% url 'bill_template_list' %}">🧾 {{ L.bill_format }}</a>
+                <a href="{% url 'system_settings' %}">⚙️ {{ L.system_settings }}</a>
+                <div class="sidebar-section">{{ L.sales_reports }}</div>
+                <a href="{% url 'sale_list' %}">🧾 {{ L.bills_sales }}</a>
+                <a href="{% url 'daily_customer_entries' %}">📅 Daily Customer Products</a>
+                <a href="{% url 'monthly_customer_search' %}">🔎 Monthly Customer Search</a>
+                <a href="{% url 'monthly_bill_create' %}">🧾 Generate Monthly Bill</a>
+                <a href="{% url 'mis_reports' %}">📊 {{ L.mis_reports }}</a>
+                <a href="{% url 'sales_report' %}">📈 {{ L.sales_report }}</a>
+                <a href="{% url 'stock_report' %}">📦 {{ L.stock_report }}</a>
+                <a href="{% url 'audit_logs' %}">🕘 {{ L.activity_logs }}</a>
+                <a href="{% url 'backup_restore' %}">💾 {{ L.backup_restore }}</a>
+            {% elif current_role == Role.SELLER %}
+                <div class="sidebar-section">{{ L.seller_tools }}</div>
+                <a href="{% url 'batch_search' %}">🔍 {{ L.product_search }}</a>
+                <a href="{% url 'customer_list' %}">🙋 {{ L.customers }}</a>
+                <a href="{% url 'sale_create' %}">🧾 {{ L.generate_bill }}</a>
+                <a href="{% url 'sale_list' %}">📚 {{ L.my_bills }}</a>
+                <a href="{% url 'daily_customer_entries' %}">📅 Daily Customer Products</a>
+                <a href="{% url 'monthly_customer_search' %}">🔎 Monthly Customer Search</a>
+                <a href="{% url 'monthly_bill_create' %}">🧾 Generate Monthly Bill</a>
+                <a href="{% url 'mis_reports' %}?type=monthly_sales">📊 Monthly Report</a>
+            {% else %}
+                <div class="sidebar-section">{{ L.customer }}</div>
+                <a href="{% url 'customer_dashboard' %}">🧾 {{ L.my_profile_bills }}</a>
+                <a href="{% url 'customer_profile' %}">🙋 {{ L.dairy_profile }}</a>
+                <a href="{% url 'change_password' %}">🔐 {{ L.change_password }}</a>
+            {% endif %}
+        </aside>
+        <main class="col-md-9 col-lg-10 main-content">
+        {% else %}
+        <main class="col-12 main-content login-main">
+        {% endif %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show no-print app-alert" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

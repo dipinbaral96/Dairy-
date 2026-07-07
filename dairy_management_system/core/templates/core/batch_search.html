@@ -1,0 +1,16 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div><h2 class="mb-1">Product / Batch Search</h2><p class="text-muted mb-0">Scan barcode/QR text, enter batch number manually, or search product name.</p></div>
+    <a class="btn btn-primary rounded-pill" href="{% url 'sale_create' %}">Generate Bill</a>
+</div>
+<form class="row g-2 mb-3" method="get">
+    <div class="col-md-7"><input class="form-control form-control-lg" name="q" value="{{ query }}" placeholder="Scan or type: MILK-20260701-001 / Milk / Curd"></div>
+    <div class="col-md-auto"><button class="btn btn-outline-primary btn-lg rounded-pill px-4">Search</button></div>
+    <div class="col-md-auto"><a class="btn btn-outline-secondary btn-lg rounded-pill px-4" href="{% url 'batch_search' %}">Clear</a></div>
+</form>
+<div class="card card-stat"><div class="card-body table-responsive"><table class="table table-hover align-middle">
+<thead><tr><th>Product</th><th>Batch No.</th><th>Available Qty</th><th>Unit</th><th>Price</th><th>Expiry</th><th>Status</th></tr></thead>
+<tbody>{% for b in batches %}<tr><td>{{ b.product.name }}</td><td><span class="badge badge-soft">{{ b.batch_number }}</span></td><td>{{ b.available_quantity }}</td><td>{{ b.product.unit.short_form }}</td><td>Rs. {{ b.product.selling_price }}</td><td>{{ b.expiry_date|default:'-' }}</td><td>{{ b.get_status_display }}</td></tr>{% empty %}<tr><td colspan="7">No available batch found.</td></tr>{% endfor %}</tbody>
+</table></div></div>
+{% endblock %}

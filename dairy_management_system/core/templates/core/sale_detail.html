@@ -1,0 +1,34 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3 no-print">
+    <div>
+        <h2 class="mb-1">Bill Details</h2>
+        <p class="text-muted mb-0">Printable customer invoice with dairy logo and batch details.</p>
+    </div>
+    <div><button class="btn btn-outline-primary rounded-pill" onclick="window.print()">Print</button> <a class="btn btn-primary rounded-pill" href="{% url 'sale_pdf' sale.pk %}">Download PDF</a></div>
+</div>
+<div class="bill-box">
+    <div class="bill-header mb-4 position-relative">
+        <img src="{{ bill_logo_url }}" alt="Dairy Logo" class="bill-logo">
+        <div class="bill-title text-center text-md-start">
+            <h2>{{ dairy_profile.name }}</h2>{% if bill_template.header_text %}<div class='fw-bold text-primary'>{{ bill_template.header_text }}</div>{% elif dairy_profile.bill_header %}<div class='fw-bold text-primary'>{{ dairy_profile.bill_header }}</div>{% endif %}
+            <div>{{ dairy_profile.address }}</div>
+            <div>PAN: {{ dairy_profile.pan_number|default:'-' }} | Contact: {{ dairy_profile.contact_number|default:'-' }}</div>
+            {% if dairy_profile.email %}<div>Email: {{ dairy_profile.email }}</div>{% endif %}
+        </div>
+            {% if sale.payment_method.payment_image %}<div class="payment-bill-image text-center"><div class="small fw-bold mb-1">{{ sale.payment_method.name }}</div><img src="{{ sale.payment_method.payment_image.url }}" alt="Payment Image"></div>{% endif %}
+    </div>
+    {% if sale.is_monthly_bill %}<div class="alert alert-info py-2"><strong>Monthly Bill:</strong> {{ sale.billing_period_start }} to {{ sale.billing_period_end }}</div>{% endif %}
+    <div class="row mb-3 g-3">
+        <div class="col-md-6"><div class="p-3 rounded-4 bg-light"><strong>Invoice No:</strong> {{ sale.bill_number }}<br><strong>Date:</strong> {{ sale.created_at|date:'Y-m-d H:i' }}<br><strong>Shop:</strong> {{ sale.shop.name|default:'-' }}</div></div>
+        <div class="col-md-6"><div class="p-3 rounded-4 bg-light"><strong>Customer:</strong> {{ sale.customer.name }}<br><strong>Mobile:</strong> {{ sale.customer.mobile_number }}<br><strong>Seller:</strong> {{ sale.seller.username }}</div></div>
+    </div>
+    <div class="table-responsive"><table class="table table-bordered">
+        <thead><tr><th>Product</th><th>Batch No.</th><th>Qty</th><th>Rate</th><th>Discount</th><th>Amount</th></tr></thead>
+        <tbody>{% for item in sale.items.all %}<tr><td>{{ item.product.name }}</td><td>{{ item.batch.batch_number }}</td><td>{{ item.quantity }}</td><td>Rs. {{ item.rate }}</td><td>Rs. {{ item.item_discount }}</td><td>Rs. {{ item.amount }}</td></tr>{% endfor %}</tbody>
+        <tfoot><tr><th colspan="5" class="text-end">Overall Discount</th><th>Rs. {{ sale.discount }}</th></tr><tr><th colspan="5" class="text-end">Paid</th><th>Rs. {{ sale.paid_amount }}</th></tr><tr><th colspan="5" class="text-end">Total</th><th>Rs. {{ sale.total_amount }}</th></tr><tr><th colspan="5" class="text-end">Return</th><th>Rs. {{ sale.return_amount }}</th></tr><tr><th colspan="5" class="text-end">Due</th><th>Rs. {{ sale.due_amount }}</th></tr></tfoot>
+    </table></div>
+    <p><strong>Payment Method:</strong> {{ sale.payment_method.name }} | <strong>Status:</strong> {{ sale.get_status_display }}</p>
+    <p class="text-center mt-4 bill-footer-note">{% if bill_template.footer_text %}{{ bill_template.footer_text }}{% else %}{{ dairy_profile.bill_footer|default:'Thank you for your purchase.' }}{% endif %}</p>
+</div>
+{% endblock %}

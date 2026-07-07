@@ -1,0 +1,32 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div><h2 class="mb-1">Customer Dashboard</h2><p class="text-muted mb-0">View profile, purchase history, bills, invoices, and payment status.</p></div>
+    <div class="d-flex gap-2"><a class="btn btn-outline-primary rounded-pill" href="{% url 'customer_profile' %}">Update Profile</a><a class="btn btn-outline-secondary rounded-pill" href="{% url 'change_password' %}">Change Password</a></div>
+</div>
+{% if customer %}
+<div class="row g-3 mb-4">
+    <div class="col-lg-4"><div class="card card-stat h-100"><div class="card-body"><div class="stat-icon">🙋</div><h6>Profile</h6><h3>{{ customer.name }}</h3><p class="mb-1">Mobile: {{ customer.mobile_number }}</p><p class="mb-1">Address: {{ customer.address|default:'-' }}</p><p class="mb-0">Email: {{ customer.email|default:'-' }}</p></div></div></div>
+    <div class="col-lg-4"><div class="card card-stat h-100"><div class="card-body"><div class="stat-icon">🧾</div><h6>Total Bills</h6><h3>{{ sales|length }}</h3><p class="text-muted mb-0">All purchases until current date.</p></div></div></div>
+    <div class="col-lg-4"><div class="card card-stat h-100"><div class="card-body"><div class="stat-icon">🥛</div><h6>Available Products</h6><h3><a href="{% url 'product_catalog' %}" class="text-decoration-none">View</a></h3><p class="text-muted mb-0">Product details and available batches.</p></div></div></div>
+</div>
+<div class="card card-stat"><div class="card-body table-responsive">
+<h5 class="fw-bold mb-3">Purchase History and Bills</h5>
+<table class="table table-hover align-middle">
+<thead><tr><th>Bill</th><th>Date</th><th>Products</th><th>Payment</th><th>Total</th><th>Paid</th><th>Due</th><th>Status</th><th>Invoice</th></tr></thead>
+<tbody>
+{% for sale in sales %}
+<tr>
+    <td><a href="{% url 'sale_detail' sale.pk %}">{{ sale.bill_number }}</a></td><td>{{ sale.created_at|date:'Y-m-d H:i' }}</td>
+    <td>{% for item in sale.items.all %}<span class="badge badge-soft">{{ item.product.name }} × {{ item.quantity }}</span> {% endfor %}</td>
+    <td>{{ sale.payment_method.name }}</td><td>Rs. {{ sale.total_amount }}</td><td>Rs. {{ sale.paid_amount }}</td><td>Rs. {{ sale.due_amount }}</td><td>{{ sale.get_status_display }}</td>
+    <td><a class="btn btn-sm btn-outline-danger rounded-pill" href="{% url 'sale_pdf' sale.pk %}">Download</a></td>
+</tr>
+{% empty %}<tr><td colspan="9">No purchase history found.</td></tr>{% endfor %}
+</tbody>
+</table>
+</div></div>
+{% else %}
+<div class="alert alert-warning">No customer profile is linked with this account. Please contact admin.</div>
+{% endif %}
+{% endblock %}

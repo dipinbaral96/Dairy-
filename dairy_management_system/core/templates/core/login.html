@@ -1,0 +1,42 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="row justify-content-center align-items-center py-5">
+    <div class="col-xl-9 col-lg-10">
+        <div class="card login-card">
+            <div class="row g-0">
+                <div class="col-lg-6 login-hero">
+                    <img src="{{ bill_logo_url }}" alt="Dairy Logo" class="mb-4">
+                    <h1 class="fw-bold mb-2">Dairy Management System</h1>
+                    <p class="mb-0 opacity-75">Manage receiving, batch stock, billing, payments, reports, backups, and activity logs from one clean dashboard.</p>
+                </div>
+                <div class="col-lg-6 bg-white">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="text-center mb-4">
+                            <img src="{{ site_logo_url }}" alt="Logo" class="brand-logo mb-2" style="width:64px;height:64px;">
+                            <h3 class="fw-bold mb-1">Login</h3>
+                            <p class="text-muted mb-0">Use your Admin, Seller, or Customer account.</p>
+                        </div>
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label">Username</label>
+                                {{ form.username }}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Password</label>
+                                {{ form.password }}
+                            </div>
+                            <button class="btn btn-primary w-100 btn-lg rounded-pill">Login</button>
+                        </form>
+                        <div class="mt-4 p-3 rounded-4 bg-light">
+                            <small class="text-muted d-block"><strong>Demo admin:</strong> admin / Admin@12345</small>
+                            <small class="text-muted d-block"><strong>Demo seller:</strong> seller1 / Seller@12345</small>
+                            <small class="text-muted d-block"><strong>Demo customer:</strong> customer1 / Customer@12345</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

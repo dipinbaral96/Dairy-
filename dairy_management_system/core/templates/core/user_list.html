@@ -1,0 +1,8 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3"><h2>Users</h2><a class="btn btn-primary" href="{% url 'user_create' %}">Add User</a></div>
+<div class="card card-stat"><div class="card-body table-responsive"><table class="table table-striped align-middle">
+<thead><tr><th>Username</th><th>Name</th><th>Email</th><th>Role</th><th>Active</th><th>Action</th></tr></thead>
+<tbody>{% for u in users %}<tr><td>{{ u.username }}</td><td>{{ u.get_full_name|default:'-' }}</td><td>{{ u.email|default:'-' }}</td><td>{{ u.profile.get_role_display }}</td><td>{{ u.is_active }}</td><td><a class="btn btn-sm btn-outline-primary" href="{% url 'user_update' u.pk %}">Edit</a> <form method="post" action="{% url 'user_delete' u.pk %}" class="d-inline" onsubmit="return confirm('Delete this user?')">{% csrf_token %}<button class="btn btn-sm btn-outline-danger">Delete</button></form></td></tr>{% empty %}<tr><td colspan="6">No users.</td></tr>{% endfor %}</tbody>
+</table></div></div>
+{% endblock %}

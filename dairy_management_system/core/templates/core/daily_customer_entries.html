@@ -1,0 +1,20 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div><h2 class="mb-1">Daily Customer Product Entries</h2><p class="text-muted mb-0">Add products supplied to regular customers daily. These entries are later combined into one monthly invoice.</p></div>
+    <div class="d-flex gap-2"><a class="btn btn-outline-primary rounded-pill" href="{% url 'monthly_customer_search' %}">Search Monthly Customers</a><a class="btn btn-primary rounded-pill" href="{% url 'daily_customer_entry_create' %}">Add Daily Product</a></div>
+</div>
+<form class="row g-2 mb-3" method="get"><div class="col-md-5"><input class="form-control" name="q" value="{{ query }}" placeholder="Search customer, mobile, product, or batch"></div><div class="col-md-auto"><button class="btn btn-outline-primary rounded-pill px-4">Search</button></div></form>
+<div class="card daily-entry-card"><div class="card-body table-responsive">
+<table class="table table-hover align-middle">
+<thead><tr><th>Date</th><th>Customer</th><th>Product</th><th>Batch</th><th>Qty</th><th>Rate</th><th>Amount</th><th>Status</th><th>Monthly Bill</th></tr></thead>
+<tbody>
+{% for e in entries %}
+<tr>
+    <td>{{ e.entry_date }}</td><td>{{ e.customer.name }}<br><small class="text-muted">{{ e.customer.mobile_number }}</small></td><td>{{ e.product.name }}</td><td><span class="badge badge-soft">{{ e.batch.batch_number }}</span></td><td>{{ e.quantity }}</td><td>Rs. {{ e.rate }}</td><td>Rs. {{ e.amount }}</td><td>{% if e.billed %}<span class="badge bg-success">Billed</span>{% else %}<span class="badge bg-warning text-dark">Unbilled</span>{% endif %}</td><td>{% if e.sale %}<a href="{% url 'sale_detail' e.sale.pk %}">{{ e.sale.bill_number }}</a>{% else %}-{% endif %}</td>
+</tr>
+{% empty %}<tr><td colspan="9">No daily customer entries found.</td></tr>{% endfor %}
+</tbody>
+</table>
+</div></div>
+{% endblock %}
